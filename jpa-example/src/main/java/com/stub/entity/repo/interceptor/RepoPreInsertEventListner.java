@@ -1,0 +1,32 @@
+package com.stub.entity.repo.interceptor;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.internal.SessionFactoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManagerFactory;
+
+@Component
+public class RepoPreInsertEventListner implements PreInsertEventListener {
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
+    @PostConstruct
+    private void init() {
+        SessionFactoryImpl sessionFactory = entityManagerFactory.unwrap(SessionFactoryImpl.class);
+        EventListenerRegistry registry = sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
+        registry.getEventListenerGroup(EventType.PRE_INSERT).appendListener(this);
+        
+        
+    }
+
+    @Override
+    public boolean onPreInsert(PreInsertEvent preInsertEvent) {
+    	final Object entity = preInsertEvent.getEntity();
+    	 
+        return false;
+    }
+}

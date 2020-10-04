@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dozer.sourceforge.net 
+      http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+
+	<mapping>
+		<class-a>com.stub.api.dto.EmpDetailsDTO</class-a>
+		<class-b>com.stub.entity.EmpDetails</class-b>
+
+		<field>
+			<a>entryDt</a>
+			<b>entryDt</b>
+		</field>
+		<field>
+			<a>lastModifiedDate</a>
+			<b>lastModifiedDate</b>
+		</field>
+
+
+		<field>
+			<a>empId</a>
+			<b>empId</b>
+		</field>
+
+		<field>
+			<a>empName</a>
+			<b>empName</b>
+		</field>
+		<field>
+			<a>dateOfBirth</a>
+			<b>dateOfBirth</b>
+		</field>
+		<field>
+			<a>empId</a>
+			<b>empAddressDtls.empId</b>
+		</field>
+		<field>
+			<a>empAddressDtlsDTO.address1</a>
+			<b>empAddressDtls.address1</b>
+		</field>
+		<field>
+			<a>empAddressDtlsDTO.address2</a>
+			<b>empAddressDtls.address2</b>
+		</field>
+		<field>
+			<a>empAddressDtlsDTO.address3</a>
+			<b>empAddressDtls.address3</b>
+		</field>
+		<field>
+			<a>empAddressDtlsDTO.pinCode</a>
+			<b>empAddressDtls.pinCode</b>
+		</field>
+		<field>
+			<a>empAddressDtlsDTO.remarks</a>
+			<b>empAddressDtls.remarks</b>
+		</field>
+	</mapping>
+
+
+	<!-- Example For List <mapping> <class-a>com.example.howtodoinjava.dozer.models.Student</class-a> 
+		<class-b>com.example.howtodoinjava.dozer.models.StudentVO</class-b> <field> 
+		<a>batch</a> <b>batchName</b> </field> <field> <a>address</a> <b>homeAddress</b> 
+		</field> </mapping> Example For List ENDDDDDD -->
+
+</mappings>
