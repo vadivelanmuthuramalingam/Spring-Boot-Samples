@@ -1,0 +1,36 @@
+spring:  application:    name: http-client-examplesserver:  port: 8080logging:  pattern:    console: "%-4relative [%thread] %d{dd-MM-yyyy HH:mm:ss.SSS} %thread %X{correlationId} [%-5level] %class{0} - %msg%n"    file: "%-4relative [%thread] %d{dd-MM-yyyy HH:mm:ss.SSS} %thread %X{correlationId} [%-5level] %class{0} - %msg%n"  file: d:/log/${spring.application.name}/application.log
+http:  oauth-clients:    enabled: false
+  rest-clients:
+    enabled: true
+    httpConnectionDetails:
+      - serviceProviderName: citistub
+        url: http://127.0.0.1:8081/
+        conectionPooling: true
+        maxTotal: 400
+        defaultMaxPerRoute: 100
+        connectTimeout: 3500
+        connectionRequestTimeout: 1000
+        socketTimeout: 100
+        validateAfterInactivity: 2000
+        sslEnabled: TRUE
+        keystorePath: null
+        oauthEnabled: FALSE
+        oauthReferenceBeanName: 'http://localhost:8081/service1'        connType: APACHE
+      - serviceProviderName: facebookService
+        url: http://www.facebook.com
+        conectionPooling: false
+        maxTotal: 500
+        defaultMaxPerRoute: 10
+        connectTimeout: 350
+        connectionRequestTimeout: 100
+        socketTimeout: 350
+        validateAfterInactivity: 200
+        sslEnabled: TRUE
+        keystorePath: null
+        oauthEnabled: FALSE
+        oauthReferenceBeanName: 'http://localhost:3000/service1'
+        connType: SIMPLE
+        
+        
+    
+##    "%-4relative [%thread] %-5level %logger{35} %X{correlationId} : %msg %n"        
