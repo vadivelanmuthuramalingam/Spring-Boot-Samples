@@ -254,3 +254,56 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         return results.getMappedResults();
     }
 }
+
+
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
+@Repository
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+
+    private final MongoTemplate mongoTemplate;
+
+    public UserRepositoryCustomImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    @Override
+    public List<UserWithAddressesAndOrdersDTO> findUsersWithAddressesAndOrders() {
+        Aggregation aggregation = newAggregation(
+                lookup("Address", "_id", "userId", "addresses"),
+                unwind("addresses", true),
+                lookup("Orders", "_id", "userId", "orders"),
+                unwind("orders", true),
+                lookup("Product", "orders.productId", "_id", "product"),
+                unwind("product", true),
+                group(fields()
+                        .and("userId", "$_id")
+                        .and("name", "$name"))
+                        .push(new BasicDBObject("street", "$addresses.street")
+                                .append("city", "$addresses.city")
+                                .append("state", "$addresses.state")
+                                .append("country", "$addresses.country"))
+                        .as("addresses")
+                        .push(new BasicDBObject("orderId", "$orders._id")
+                                .append("productId", "$orders.productId")
+                                .append("productName", "$product.productName")
+                                .append("deliveryStatus", "$orders.deliveryStatus")
+                                .append("deliveryDate", "$orders.deliveryDate")
+                                .append("orderDate", "$orders.orderDate"))
+                        .as("orders"),
+                project("name", "addresses", "orders")
+                        .and("_id.userId").as("userId")
+        );
+
+        AggregationResults<UserWithAddressesAndOrdersDTO> results = mongoTemplate.aggregate(aggregation, "User", UserWithAddressesAndOrdersDTO.class);
+        return results.getMappedResults();
+    }
+}
