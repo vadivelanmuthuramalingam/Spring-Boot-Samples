@@ -1,0 +1,152 @@
+MOngodb Aggregation Sample
+
+
+{
+  "_id": ObjectId("64f5d1e6d0a5d1e6d0a5d1e6"),
+  "Name": "John Doe",
+  "age": 30,
+  "status": "active"
+}
+
+{
+  "_id": ObjectId("64f5d2a7d0a5d2a7d0a5d2a7"),
+  "userId": ObjectId("64f5d1e6d0a5d1e6d0a5d1e6"),
+  "street": "123 Main St",
+  "city": "Springfield",
+  "state": "IL",
+  "country": "USA"
+}
+
+
+{
+  "_id": ObjectId("64f5d317d0a5d317d0a5d317"),
+  "productName": "Smartphone",
+  "productType": "Electronics",
+  "amount": 699.99,
+  "ratings": 4.5
+}
+
+{
+  "_id": ObjectId("64f5d3b8d0a5d3b8d0a5d3b8"),
+  "userId": ObjectId("64f5d1e6d0a5d1e6d0a5d1e6"),
+  "productId": ObjectId("64f5d317d0a5d317d0a5d317"),
+  "deliveryStatus": "delivered",
+  "deliveryDate": ISODate("2023-08-01T10:00:00Z"),
+  "orderDate": ISODate("2023-07-25T10:00:00Z")
+}
+
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+
+@Data
+@Document(collection = "User")
+public class User {
+
+    @Id
+    private String id;
+    
+    private String name;
+    private int age;
+    private String status;
+
+    @Indexed(unique = true)
+    private String email;
+}
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+
+@Data
+@Document(collection = "Address")
+public class Address {
+
+    @Id
+    private String id;
+    
+    private String userId;
+    private String street;
+    private String city;
+    private String state;
+    private String country;
+}
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+
+@Data
+@Document(collection = "Product")
+public class Product {
+
+    @Id
+    private String id;
+    
+    private String productName;
+    private String productType;
+    private double amount;
+    private double ratings;
+}
+
+
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+
+@Data
+@Document(collection = "Orders")
+public class Orders {
+
+    @Id
+    private String id;
+    
+    private String userId;
+    private String productId;
+    private String deliveryStatus;
+    private Date deliveryDate;
+    private Date orderDate;
+}
+
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
+@Repository
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+
+    private final MongoTemplate mongoTemplate;
+
+    public UserRepositoryCustomImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
+
+    @Override
+    public List<UserAddressDTO> findUsersWithAddress() {
+        Aggregation aggregation = newAggregation(
+                lookup("Address", "_id", "userId", "address"),
+                unwind("address", true),
+                project("name")
+                        .and("_id").as("userId")
+                        .and("address.street").as("street")
+                        .and("address.city").as("city")
+                        .and("address.country").as("country")
+        );
+
+        AggregationResults<UserAddressDTO> results = mongoTemplate.aggregate(aggregation, "User", UserAddressDTO.class);
+        return results.getMappedResults();
+    }
+}
